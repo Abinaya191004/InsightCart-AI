@@ -33,8 +33,9 @@ app.post("/analyze", async (req, res) => {
   /* 🔒 PREVENT TOKEN OVERFLOW */
   const MAX_CHARS = 8000;
   // LIMIT INPUT SIZE
-  const safeResume = resumeText.slice(0, 6000);
-  const safeJD = jobDescription ? jobDescription.slice(0, 4000) : "";
+  const safeResume = resumeText.slice(0, 3000);
+  const safeJD = jobDescription ? jobDescription.slice(0, 2000) : "";
+
 
   // SHORTER CLEAN PROMPT
   const prompt = `
