@@ -1,5 +1,6 @@
 import { useState } from "react";
 import BackButton from "../Components/BackButton";
+import { API } from "../config/api";
 
 export default function AddProduct({ goToBack }) {
   const [form, setForm] = useState({ name: "", price: "", image: "", category: "" });
@@ -14,7 +15,7 @@ export default function AddProduct({ goToBack }) {
     e.preventDefault();
     setStatus("loading");
     try {
-      const res = await fetch("http://localhost:5000/api/products", {
+      const res = await fetch(`${API}/api/products`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -68,7 +68,7 @@ const commonQuestions = {
 
 const handleChatbot = (req, res) => {
   try {
-    const { message, conversationHistory } = req.body;
+    const { message, ory } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: "Message is required" });

@@ -1,3 +1,4 @@
+import { API } from "../config/api";
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 
@@ -32,51 +33,56 @@ function Chatbot({ isOpen, setIsOpen }) {
     e.preventDefault();
     if (!inputValue.trim()) return;
 
+    const userText = inputValue;   // ✅ store message before clearing input
+
     // Add user message
     const userMessage = {
       id: Date.now(),
-      text: inputValue,
+      text: userText,
       sender: "user",
       timestamp: new Date(),
     };
+
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setLoading(true);
 
     try {
-      // Call backend API to get AI response
-      const response = await fetch(
-        "http://localhost:5000/api/ai",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: inputValue,
-            conversationHistory: messages,
-          }),
-        }
-      );
+      const response = await fetch(`${API}/api/ai`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: userText,   // ✅ send stored message
+        }),
+      });
 
       if (!response.ok) throw new Error("Failed to get response");
 
       const data = await response.json();
+
       const botMessage = {
         id: Date.now() + 1,
-        text: data.reply || "I apologize, but I couldn't understand that. Please try again.",
+        text: data.reply || "I couldn't understand that. Please try again.",
         sender: "bot",
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, botMessage]);
+
     } catch (error) {
       console.error("Chatbot error:", error);
-      // Fallback response
+
       const fallbackMessage = {
         id: Date.now() + 1,
-        text: "I'm having trouble connecting right now. Please try again later or contact our support team.",
+        text: "I'm having trouble connecting right now. Please try again later.",
         sender: "bot",
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, fallbackMessage]);
+
     } finally {
       setLoading(false);
     }

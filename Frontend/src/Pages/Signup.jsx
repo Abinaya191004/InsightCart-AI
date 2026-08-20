@@ -1,12 +1,16 @@
 import { useState } from "react";
 import axios from "axios";
 import { UserPlus } from "lucide-react";
+import { API } from "../config/api";
 
 function Signup({ switchToLogin }) {
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
+    phone: "",
+    address: "",
+    gender: "female",
   });
 
   const handleChange = (e) =>
@@ -15,7 +19,7 @@ function Signup({ switchToLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/auth/signup", form);
+      await axios.post(`${API}/api/auth/signup`, form);
       switchToLogin();
     } catch (err) {
       alert(err.response.data.message);
@@ -59,6 +63,28 @@ function Signup({ switchToLogin }) {
               onChange={handleChange}
               className="w-full p-3 border rounded-lg"
             />
+            <input
+              name="phone"
+              placeholder="Phone Number"
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg"
+            />
+            <input
+              name="address"
+              placeholder="Address"
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg"
+            />
+            <select
+              name="gender"
+              onChange={handleChange}
+              value={form.gender}
+              className="w-full p-3 border rounded-lg bg-white"
+            >
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="other">Other</option>
+            </select>
 
             <button className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition">
               Sign Up

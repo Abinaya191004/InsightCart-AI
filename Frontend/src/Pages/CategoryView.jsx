@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import ProductCard from "../Components/ProductCard";
 import BackButton from "../Components/BackButton";
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import { API } from "../config/api";
 
 const menShirt = `${API}/api/images/6988d72ac4ab78b6b1e69d45`;
 const menShoes = `${API}/api/images/6988d72ac4ab78b6b1e69d47`;
@@ -103,7 +103,7 @@ function CategoryView({ category, addToCart, favorites, toggleFavorite, goToBack
   useEffect(() => {
     if (!selectedSubCategory) return;
 
-    const url = `http://localhost:5000/api/products?category=${category}`;
+    const url = `${API}/api/products?category=${category}`;
     axios.get(url).then((res) => {
       const all = res.data || [];
       const sub = selectedSubCategory.toLowerCase();

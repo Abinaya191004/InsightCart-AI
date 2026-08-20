@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Navbar from "./Components/Navbar";
 import Chatbot from "./Components/Chatbot";
 import Home from "./Pages/Home";
@@ -10,6 +11,7 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import Favorites from "./Pages/Favorites"
 import AddProduct from "./Pages/AddProduct";
 import Account from "./Pages/Account";
+import { API } from "./config/api";
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -17,18 +19,22 @@ function App() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState("home");
   const [previousPage, setPreviousPage] = useState("home");
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser && JSON.parse(storedUser).favorites 
+      ? JSON.parse(storedUser).favorites 
+      : [];
+  });
   const [checkoutProduct, setCheckoutProduct] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [chatbotOpen, setChatbotOpen] = useState(false);
 
   console.log("App rendered, page:", page);
 
-  const user = {
-    name: "Abinaya",
-    email: "abinaya@gmail.com",
-    gender: "female",
-  };
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   const navigateTo = (newPage) => {
     setPreviousPage(page);
@@ -57,13 +63,31 @@ function App() {
     navigateTo("cart");
   };
 
-  const toggleFavorite = (product) => {
+  const toggleFavorite = async (product) => {
     const exists = favorites.find((p) => p._id === product._id);
 
+    let newFavs;
     if (exists) {
-      setFavorites(favorites.filter((p) => p._id !== product._id));
+      newFavs = favorites.filter((p) => p._id !== product._id);
     } else {
-      setFavorites([...favorites, product]);
+      newFavs = [...favorites, product];
+    }
+    setFavorites(newFavs);
+
+    if (user) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.post(
+          `${API}/api/auth/favorites`,
+          { favorites: newFavs.map(f => f._id) },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        // update local storage user
+        const updatedUser = { ...user, favorites: newFavs };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      } catch (err) {
+        console.error("Failed to update favorites in DB", err);
+      }
     }
   };
 
@@ -74,7 +98,8 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setPage("home");
+    localStorage.removeItem("user");
+    window.location.reload();
   };
 
   return (
@@ -165,6 +190,7 @@ function App() {
           goToBack={goBack}
           logout={handleLogout}
           favorites={favorites}
+          cart={cart}
         />
       )}
 

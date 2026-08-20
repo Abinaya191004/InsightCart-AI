@@ -1,18 +1,18 @@
-import { useState } from "react";
-import { Mail, MapPin, Phone, DollarSign, Settings as SettingsIcon, LogOut, Heart, Globe } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Mail, MapPin, Phone, DollarSign, Settings as SettingsIcon, LogOut, Heart, Globe, ShoppingCart, Package } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-function Account({ user, goToBack, logout, favorites = [] }) {
+function Account({ user, goToBack, logout, favorites = [], cart = [] }) {
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [showSettings, setShowSettings] = useState(false);
   const [showPaymentDetails, setShowPaymentDetails] = useState(false);
   const [userProfile, setUserProfile] = useState({
     name: user?.name || "User",
     email: user?.email || "",
-    phone: user?.phone || "+91 9876543210",
-    address: user?.address || "123 Main Street, City, State",
-    gender: "female",
+    phone: user?.phone || "Not Provided",
+    address: user?.address || "Not Provided",
+    gender: user?.gender || "female",
     upi: "user@upi",
     bankAccount: "1234567890",
     ifsc: "SBIN0001234",
@@ -147,6 +147,65 @@ function Account({ user, goToBack, logout, favorites = [] }) {
             </div>
           ) : (
             <p className="text-gray-500">No items in wishlist yet.</p>
+          )}
+        </div>
+
+        {/* Cart Section */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <ShoppingCart className="text-indigo-500" />
+            <h3 className="text-xl font-semibold">Products Added to Cart ({cart.length})</h3>
+          </div>
+          {cart.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {cart.map((item, index) => (
+                <div
+                  key={index}
+                  className="border rounded p-3 hover:shadow-lg transition bg-indigo-50 border-indigo-100"
+                >
+                  <p className="font-semibold text-sm truncate">
+                    {item.name || item.title || item.productId?.name}
+                  </p>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-indigo-600 font-bold">
+                      ₹{item.price || item.productId?.price || "N/A"}
+                    </p>
+                    <span className="text-xs bg-indigo-200 text-indigo-800 px-2 py-1 rounded-full">
+                      Qty: {item.qty}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No products in cart.</p>
+          )}
+        </div>
+
+        {/* Purchases Section */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Package className="text-green-500" />
+            <h3 className="text-xl font-semibold">Purchased Products ({user?.purchases?.length || 0})</h3>
+          </div>
+          {user?.purchases?.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {user.purchases.map((item, index) => (
+                <div
+                  key={index}
+                  className="border rounded p-3 hover:shadow-lg transition bg-green-50 border-green-100"
+                >
+                  <p className="font-semibold text-sm truncate">
+                    {item.name || item.title || "Purchased Item"}
+                  </p>
+                  <p className="text-green-700 font-bold mt-1">
+                    Delivered
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No purchase history found.</p>
           )}
         </div>
 

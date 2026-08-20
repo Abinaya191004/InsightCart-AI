@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ProductCard from "../Components/ProductCard";
+import { API } from "../config/api";
 import CategoryBar from "../Components/CategoryBar";
 import BackButton from "../Components/BackButton";
 
@@ -12,8 +13,8 @@ function Products({ addToCart, search, favorites, toggleFavorite, goToBack, goTo
   useEffect(() => {
     const url =
       category === "All"
-        ? "http://localhost:5000/api/products"
-        : `http://localhost:5000/api/products?category=${category}`;
+        ? `${API}/api/products`
+        : `${API}/api/products?category=${category}`;
 
     axios.get(url).then((res) => setProducts(res.data));
   }, [category]);
@@ -69,7 +70,7 @@ function Products({ addToCart, favorites, toggleFavorite }) {
   // 🔹 Fetch ALL products once (for dropdown generation)
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/products")
+      .get(`${API}/api/products`)
       .then((res) => {
         setAllProducts(res.data);
         setProducts(res.data);

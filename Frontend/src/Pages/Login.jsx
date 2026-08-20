@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { LogIn } from "lucide-react";
+import { API } from "../config/api";
 
 function Login({ switchToSignup }) {
   const [form, setForm] = useState({
@@ -15,16 +16,25 @@ function Login({ switchToSignup }) {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        `${API}/api/auth/login`,
         form
       );
+
+      console.log("LOGIN RESPONSE:", res.data); // 👈 debug
+
+      // ✅ store token
       localStorage.setItem("token", res.data.token);
+
+      // ✅ store user (IMPORTANT)
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
       window.location.reload();
+
     } catch (err) {
-      alert(err.response.data.message);
+      alert(err.response?.data?.message || "Login failed");
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
